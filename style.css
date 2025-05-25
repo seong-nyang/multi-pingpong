@@ -28,7 +28,7 @@ canvas#game {
   top: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* 기본 클릭 비활성화 */
+  pointer-events: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -50,7 +50,7 @@ canvas#game {
 
 /* 레디 버튼 */
 #readyBtn {
-  pointer-events: auto; /* 클릭 가능하게 */
+  pointer-events: auto;
   padding: 12px 32px;
   font-size: 18px;
   font-weight: bold;
