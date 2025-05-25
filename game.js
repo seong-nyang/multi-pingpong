@@ -1,18 +1,18 @@
-const socket = io('https://multi-pingpong-293cc4ba4236.herokuapp.com/');
+const socket = io('https://multi-pingpong-293cc4ba4236.herokuapp.com', {
+  path: '/socket.io',
+  transports: ['websocket']
+});
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
-
-const leftScoreDiv = document.getElementById("leftScore");
-const rightScoreDiv = document.getElementById("rightScore");
+const scoreDiv = document.getElementById("score");
 const statusDiv = document.getElementById("status");
 const readyBtn = document.getElementById("readyBtn");
 
 let player = null;
 let gameStarted = false;
-let localY = null;
 
 socket.on("init", (data) => {
-  console.log(">> INIT:", data);
   player = data;
 });
 
@@ -22,10 +22,7 @@ socket.on("full", () => {
 
 socket.on("state", (state) => {
   draw(state);
-
-  leftScoreDiv.textContent = state.scores.left;
-  rightScoreDiv.textContent = state.scores.right;
-
+  scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
   if (!state.started) {
     statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
   } else {
@@ -40,22 +37,10 @@ socket.on("state", (state) => {
   }
 });
 
-socket.on("start", () => {
-  console.log(">> GAME START");
-  gameStarted = true;
-  readyBtn.disabled = true;
-  readyBtn.textContent = "게임 진행 중";
-});
-
 document.addEventListener("mousemove", (e) => {
-  if (!gameStarted || player === null) {
-    console.log(">> BLOCKED: gameStarted =", gameStarted, "player =", player);
-    return;
-  }
-
+  if (!gameStarted) return;
   const rect = canvas.getBoundingClientRect();
   const y = e.clientY - rect.top;
-  localY = y;
   socket.emit("move", y);
 });
 
@@ -65,24 +50,26 @@ readyBtn.addEventListener("click", () => {
   readyBtn.textContent = "READY 완료!";
 });
 
+socket.on("start", () => {
+  gameStarted = true;
+});
+
 function draw(state) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  // 배경 검정색
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  // 플레이어 패들
   ctx.fillStyle = "white";
   for (let id in state.players) {
     const p = state.players[id];
     let x = p.side === "left" ? 10 : canvas.width - 20;
-
-    if (id === player && localY !== null) {
-      ctx.fillRect(x, localY - 50, 10, 100);
-    } else {
-      ctx.fillRect(x, p.y - 50, 10, 100);
-    }
+    ctx.fillRect(x, p.y - 50, 10, 100);
   }
 
+  // 공
   ctx.beginPath();
   ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI * 2);
   ctx.fillStyle = "white";
