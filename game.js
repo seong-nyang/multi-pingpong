@@ -1,4 +1,8 @@
-const socket = io('https://multi-pingpong-293cc4ba4236.herokuapp.com/');
+const socket = io('https://multi-pingpong-293cc4ba4236.herokuapp.com', {
+  path: '/socket.io',
+  transports: ['websocket']
+});
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const scoreDiv = document.getElementById("score");
@@ -62,7 +66,7 @@ function draw(state) {
   for (let id in state.players) {
     const p = state.players[id];
     let x = p.side === "left" ? 10 : canvas.width - 20;
-    ctx.fillRect(x, p.y - 50, 10, 100); // 패들 크기 10x100
+    ctx.fillRect(x, p.y - 50, 10, 100);
   }
 
   // 공
