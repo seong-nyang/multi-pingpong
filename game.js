@@ -10,10 +10,13 @@ const statusDiv = document.getElementById("status");
 const readyBtn = document.getElementById("readyBtn");
 
 let player = null;
+let playerId = null;
 let gameStarted = false;
+let localPaddleY = 200;
 
 socket.on("init", (data) => {
   player = data;
+  playerId = data.id;
 });
 
 socket.on("full", () => {
@@ -23,6 +26,7 @@ socket.on("full", () => {
 socket.on("state", (state) => {
   draw(state);
   scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
+
   if (!state.started) {
     statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
   } else {
@@ -37,13 +41,6 @@ socket.on("state", (state) => {
   }
 });
 
-document.addEventListener("mousemove", (e) => {
-  if (!gameStarted) return;
-  const rect = canvas.getBoundingClientRect();
-  const y = e.clientY - rect.top;
-  socket.emit("move", y);
-});
-
 readyBtn.addEventListener("click", () => {
   socket.emit("ready");
   readyBtn.disabled = true;
@@ -54,22 +51,39 @@ socket.on("start", () => {
   gameStarted = true;
 });
 
+// 실시간 패들 위치 업데이트 (클라이언트 예측 + 서버 전송)
+let mouseY = 200;
+document.addEventListener("mousemove", (e) => {
+  const rect = canvas.getBoundingClientRect();
+  mouseY = e.clientY - rect.top;
+});
+
+function sendMoveLoop() {
+  if (gameStarted && player) {
+    socket.emit("move", mouseY);
+    localPaddleY = mouseY;
+  }
+  requestAnimationFrame(sendMoveLoop);
+}
+sendMoveLoop();
+
+// 렌더링
 function draw(state) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // 배경 검정색
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // 플레이어 패들
   ctx.fillStyle = "white";
   for (let id in state.players) {
     const p = state.players[id];
     let x = p.side === "left" ? 10 : canvas.width - 20;
-    ctx.fillRect(x, p.y - 50, 10, 100);
+
+    // 내가 조종하는 패들은 로컬 예측 위치 사용
+    const y = (id === playerId) ? localPaddleY : p.y;
+    ctx.fillRect(x, y - 50, 10, 100);
   }
 
-  // 공
   ctx.beginPath();
   ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI * 2);
   ctx.fillStyle = "white";
