@@ -61,25 +61,4 @@ canvas#game {
 #readyBtn {
   pointer-events: auto;
   padding: 12px 32px;
-  font-size: 18px;
-  font-weight: bold;
-  background-color: #0f0;
-  color: #000;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 0 10px #0f0;
-}
-
-#readyBtn:hover {
-  background-color: #0c0;
-  transform: scale(1.05);
-}
-
-#readyBtn:disabled {
-  background-color: #444;
-  color: #888;
-  cursor: not-allowed;
-  box-shadow: none;
-}
+ 

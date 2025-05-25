@@ -25,19 +25,17 @@ socket.on("state", (state) => {
   leftScoreDiv.textContent = state.scores.left;
   rightScoreDiv.textContent = state.scores.right;
 
+  if (!state.started) {
+    statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
+  } else {
+    statusDiv.textContent = "";
+  }
+
   if (state.winner) {
     statusDiv.textContent = `게임 종료! 승자: ${state.winner}`;
     readyBtn.disabled = false;
     readyBtn.textContent = "다시 시작하려면 READY";
     gameStarted = false;
-  } else if (!state.started) {
-    statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
-    readyBtn.disabled = false;
-    readyBtn.textContent = "READY";
-    gameStarted = false;
-  } else {
-    statusDiv.textContent = "";
-    readyBtn.disabled = true;
   }
 });
 
@@ -74,6 +72,7 @@ function draw(state) {
     const p = state.players[id];
     let x = p.side === "left" ? 10 : canvas.width - 20;
 
+    // 본인이면 localY 사용
     if (id === player && localY !== null) {
       ctx.fillRect(x, localY - 50, 10, 100);
     } else {
