@@ -1,13 +1,15 @@
 const socket = io('https://multi-pingpong-293cc4ba4236.herokuapp.com/');
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
-const scoreDiv = document.getElementById("score");
+
+const leftScoreDiv = document.getElementById("leftScore");
+const rightScoreDiv = document.getElementById("rightScore");
 const statusDiv = document.getElementById("status");
 const readyBtn = document.getElementById("readyBtn");
 
 let player = null;
 let gameStarted = false;
-let localY = null; // 내 패들 위치
+let localY = null;
 
 socket.on("init", (data) => {
   player = data;
@@ -19,7 +21,9 @@ socket.on("full", () => {
 
 socket.on("state", (state) => {
   draw(state);
-  scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
+
+  leftScoreDiv.textContent = state.scores.left;
+  rightScoreDiv.textContent = state.scores.right;
 
   if (!state.started) {
     statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
@@ -66,7 +70,6 @@ function draw(state) {
     const p = state.players[id];
     let x = p.side === "left" ? 10 : canvas.width - 20;
 
-    // 본인이면 localY 사용
     if (id === player && localY !== null) {
       ctx.fillRect(x, localY - 50, 10, 100);
     } else {

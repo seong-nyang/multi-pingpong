@@ -1,4 +1,3 @@
-/* 기본 설정 */
 body {
   margin: 0;
   background-color: #000;
@@ -10,12 +9,10 @@ body {
   height: 100vh;
 }
 
-/* 전체 컨테이너 */
 #container {
   position: relative;
 }
 
-/* 캔버스 */
 canvas#game {
   border: 2px solid #fff;
   background-color: #111;
@@ -26,26 +23,38 @@ canvas#game {
 #overlay {
   position: absolute;
   top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-#score {
-  font-size: 24px;
-  margin-bottom: 16px;
+/* 양쪽 점수 */
+#scoreboard {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 32px;
+  font-weight: bold;
   pointer-events: none;
 }
 
+.score {
+  width: 100px;
+  text-align: center;
+}
+
+/* 상태 메시지 */
 #status {
   font-size: 18px;
-  margin-bottom: 24px;
   color: #ccc;
-  pointer-events: none;
+  margin-bottom: 20px;
 }
 
 /* 레디 버튼 */
