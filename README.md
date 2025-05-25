@@ -6,7 +6,8 @@ Socket.IO를 이용한 Node.js 기반 멀티플레이 게임으로, 브라우저
 ---
 
 ## 🔗 배포 링크
-- 🎮 **게임 시작하기**: [https://seong-nyang.github.io/multi-pingpong/] 
+- 🎮 **게임 시작하기**: [https://seong-nyang.github.io/multi-pingpong/]
+
 ---
 
 ## 🛠 사용 기술
@@ -33,6 +34,8 @@ cd multi-pingpong-client
 
 ⚠️ .js 코드 내 socket.io 연결 주소는 실제 배포된 서버 주소로 설정되어 있어야 합니다.
 
+---
+
 🎮 게임 방법
 두 명이 각각 접속하면 자동으로 좌우 플레이어로 배정됩니다.
 
@@ -44,12 +47,16 @@ READY 버튼을 누르면 대기 상태로 진입합니다.
 
 먼저 5점을 득점한 쪽이 승리합니다!
 
+---
+
 📁 파일 구성
 multi-pingpong-client/
 ├── index.html          # 메인 HTML
 ├── style.css           # 게임 UI 스타일
 ├── game.js             # 클라이언트 로직 및 Socket.IO 통신
 └── README.md           # 이 문서
+
+---
 
 ## 📮 라이선스 & 사용
 
