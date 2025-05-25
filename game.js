@@ -12,6 +12,7 @@ let gameStarted = false;
 let localY = null;
 
 socket.on("init", (data) => {
+  console.log(">> INIT:", data);
   player = data;
 });
 
@@ -39,8 +40,19 @@ socket.on("state", (state) => {
   }
 });
 
+socket.on("start", () => {
+  console.log(">> GAME START");
+  gameStarted = true;
+  readyBtn.disabled = true;
+  readyBtn.textContent = "게임 진행 중";
+});
+
 document.addEventListener("mousemove", (e) => {
-  if (!gameStarted || player === null) return;
+  if (!gameStarted || player === null) {
+    console.log(">> BLOCKED: gameStarted =", gameStarted, "player =", player);
+    return;
+  }
+
   const rect = canvas.getBoundingClientRect();
   const y = e.clientY - rect.top;
   localY = y;
@@ -53,26 +65,17 @@ readyBtn.addEventListener("click", () => {
   readyBtn.textContent = "READY 완료!";
 });
 
-socket.on("start", () => {
-  gameStarted = true;
-  readyBtn.disabled = true;
-  readyBtn.textContent = "게임 진행 중";
-});
-
 function draw(state) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // 배경
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // 패들
   ctx.fillStyle = "white";
   for (let id in state.players) {
     const p = state.players[id];
     let x = p.side === "left" ? 10 : canvas.width - 20;
 
-    // 본인이면 localY 사용
     if (id === player && localY !== null) {
       ctx.fillRect(x, localY - 50, 10, 100);
     } else {
@@ -80,7 +83,6 @@ function draw(state) {
     }
   }
 
-  // 공
   ctx.beginPath();
   ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI * 2);
   ctx.fillStyle = "white";
