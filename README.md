@@ -48,8 +48,9 @@ READY 버튼을 누르면 대기 상태로 진입합니다.
 먼저 5점을 득점한 쪽이 승리합니다!
 
 ---
+
+## 📁 파일 구성
 ```
-📁 파일 구성
 multi-pingpong-client/
 ├── index.html          # 메인 HTML
 ├── style.css           # 게임 UI 스타일
