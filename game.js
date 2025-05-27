@@ -15,15 +15,18 @@ const chatInput = document.getElementById("chatInput");
 let player = null;
 let gameStarted = false;
 let isSpectator = false;
-
 let localPlayerY = 200;
 let players = {};
+let nicknames = {};
 
 socket.on("init", (data) => {
   player = data;
   isSpectator = data.spectator;
   if (!isSpectator) {
     players[player.id] = { y: player.y, side: player.side };
+  }
+  if (isSpectator) {
+    readyBtn.style.display = "none";
   }
 });
 
@@ -37,6 +40,7 @@ socket.on("countdown", (number) => {
 
 socket.on("state", (state) => {
   players = { ...state.players };
+  nicknames = { ...state.nicknames };
 
   if (player && !isSpectator && players[player.id]) {
     players[player.id].y = localPlayerY;
