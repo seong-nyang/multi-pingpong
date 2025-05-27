@@ -9,12 +9,17 @@ const scoreDiv = document.getElementById("score");
 const statusDiv = document.getElementById("status");
 const readyBtn = document.getElementById("readyBtn");
 
+// 카운트다운 요소
+const countdownDiv = document.createElement("div");
+countdownDiv.id = "countdown";
+document.getElementById("container").appendChild(countdownDiv);
+
 let player = null;
 let gameStarted = false;
 let countdown = null;
+
 let localPlayerY = 200;
 let players = {};
-let winner = null;
 
 socket.on("init", (data) => {
   player = data;
@@ -30,10 +35,6 @@ socket.on("state", (state) => {
 
   if (player && players[player.id]) {
     const serverY = state.players[player.id]?.y ?? localPlayerY;
-    players[player.id].y = players[player.id].y
-      ? players[player.id].y * 0.8 + serverY * 0.2
-      : serverY;
-
     players[player.id].y = localPlayerY;
   }
 
@@ -42,21 +43,43 @@ socket.on("state", (state) => {
   scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
   if (!state.started && !state.winner) {
     statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
-  } else if (state.winner) {
+  } else {
+    statusDiv.textContent = "";
+  }
+
+  if (state.winner) {
     statusDiv.textContent = `게임 종료! 승자: ${state.winner}`;
     readyBtn.disabled = false;
     readyBtn.textContent = "다시 시작하려면 READY";
     gameStarted = false;
-  } else {
-    statusDiv.textContent = "";
   }
+});
+
+socket.on("start", () => {
+  gameStarted = false;
+  let count = 3;
+  countdownDiv.textContent = count;
+  countdownDiv.style.display = "block";
+
+  countdown = setInterval(() => {
+    count--;
+    if (count > 0) {
+      countdownDiv.textContent = count;
+    } else {
+      clearInterval(countdown);
+      countdownDiv.style.display = "none";
+      gameStarted = true;
+    }
+  }, 1000);
 });
 
 document.addEventListener("mousemove", (e) => {
   if (!gameStarted) return;
+
   const rect = canvas.getBoundingClientRect();
   const y = e.clientY - rect.top;
   localPlayerY = Math.min(Math.max(y, 50), 350);
+
   socket.emit("move", localPlayerY);
 });
 
@@ -66,40 +89,28 @@ readyBtn.addEventListener("click", () => {
   readyBtn.textContent = "READY 완료!";
 });
 
-socket.on("start", () => {
-  let count = 3;
-  countdown = setInterval(() => {
-    statusDiv.textContent = count;
-    count--;
-    if (count < 0) {
-      clearInterval(countdown);
-      statusDiv.textContent = "";
-      gameStarted = true;
-    }
-  }, 1000);
-});
-
 function draw(state) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.fillStyle = "white";
-  ctx.beginPath();
-  ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.closePath();
-
-  ctx.font = "16px Arial";
-  ctx.fillStyle = "white";
-
   for (let id in players) {
     const p = players[id];
     let x = p.side === "left" ? 10 : canvas.width - 20;
     ctx.fillRect(x, p.y - 50, 10, 100);
 
-    if (id === player?.id) {
-      ctx.fillText("YOU", x - 5, p.y - 60);
+    if (player && id === player.id) {
+      ctx.fillStyle = "red";
+      ctx.font = "16px Arial";
+      ctx.fillText("YOU", x, p.y - 60);
+      ctx.fillStyle = "white";
     }
   }
+
+  ctx.beginPath();
+  ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI * 2);
+  ctx.fillStyle = "white";
+  ctx.fill();
+  ctx.closePath();
 }

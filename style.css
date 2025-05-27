@@ -38,9 +38,24 @@ canvas#game {
 }
 
 #countdown {
-  font-size: 48px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 72px;
   font-weight: bold;
-  color: #0f0;
+  color: yellow;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.label {
+  position: absolute;
+  font-size: 18px;
+  font-weight: bold;
+  color: red;
+  pointer-events: none;
+  z-index: 10;
 }
 
 #readyBtn {
