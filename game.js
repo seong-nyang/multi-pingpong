@@ -67,6 +67,7 @@ socket.on("start", () => {
 socket.on("chat", ({ id, msg }) => {
   const name = nicknames[id] || "익명?";
   const p = document.createElement("div");
+  p.className = "chat-message";
   p.textContent = `${name}: ${msg}`;
   messagesDiv.appendChild(p);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;

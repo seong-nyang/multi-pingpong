@@ -70,12 +70,11 @@ canvas#game {
   box-shadow: none;
 }
 
-/* 채팅 UI 오른쪽 고정 */
 #chat {
   position: absolute;
   top: 10px;
-  right: -230px;
-  width: 200px;
+  right: -260px;
+  width: 240px;
   height: 380px;
   display: flex;
   flex-direction: column;
@@ -90,6 +89,16 @@ canvas#game {
   overflow-y: auto;
   font-size: 14px;
   margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chat-message {
+  background-color: #222;
+  padding: 4px 6px;
+  border-radius: 6px;
+  word-break: break-word;
 }
 
 #chatInput {
