@@ -7,13 +7,13 @@ const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const scoreDiv = document.getElementById("score");
 const statusDiv = document.getElementById("status");
-const readyBtn = document.getElementById("readyBtn");
 const countdownDiv = document.getElementById("countdown");
+const readyBtn = document.getElementById("readyBtn");
 
 let player = null;
-let gameStarted = false;
 let localPlayerY = 300;
 let players = {};
+let gameStarted = false;
 let countdown = null;
 
 socket.on("init", (data) => {
@@ -25,23 +25,9 @@ socket.on("full", () => {
   alert("방이 가득 찼습니다.");
 });
 
-socket.on("countdown", (number) => {
-  countdownDiv.textContent = number;
-  countdownDiv.classList.remove("hidden");
-  if (number === 0) {
-    countdownDiv.classList.add("hidden");
-  }
-});
-
-socket.on("start", () => {
-  gameStarted = true;
-});
-
 socket.on("state", (state) => {
   players = { ...state.players };
-
   if (player && players[player.id]) {
-    const serverY = state.players[player.id]?.y ?? localPlayerY;
     players[player.id].y = localPlayerY;
   }
 
@@ -49,17 +35,22 @@ socket.on("state", (state) => {
 
   scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
 
-  if (!state.started) {
-    statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
+  if (state.countdown !== null) {
+    countdownDiv.textContent = state.countdown > 0 ? state.countdown : "";
+    statusDiv.textContent = "게임 준비 중...";
   } else {
-    statusDiv.textContent = "";
+    countdownDiv.textContent = "";
+    statusDiv.textContent = state.winner ? `게임 종료! 승자: ${state.winner}` : "";
   }
 
   if (state.winner) {
-    statusDiv.textContent = `게임 종료! 승자: ${state.winner}`;
     readyBtn.disabled = false;
     readyBtn.textContent = "다시 시작하려면 READY";
     gameStarted = false;
+  }
+
+  if (state.started) {
+    gameStarted = true;
   }
 });
 
@@ -79,27 +70,25 @@ readyBtn.addEventListener("click", () => {
 
 function draw(state) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "white";
   for (let id in players) {
     const p = players[id];
     const x = p.side === "left" ? 20 : canvas.width - 40;
+    ctx.fillStyle = "white";
     ctx.fillRect(x, p.y - 60, 20, 120);
 
     if (id === player?.id) {
-      ctx.font = "16px Segoe UI";
-      ctx.fillStyle = "lime";
-      ctx.textAlign = "center";
-      ctx.fillText("YOU", x + 10, p.y - 70);
-      ctx.fillStyle = "white";
+      ctx.fillStyle = "#0f0";
+      ctx.font = "16px sans-serif";
+      ctx.fillText("YOU", x, p.y - 70);
     }
   }
 
+  const ball = state.ball;
   ctx.beginPath();
-  ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI * 2);
+  ctx.arc(ball.x, ball.y, 10, 0, Math.PI * 2);
   ctx.fillStyle = "white";
   ctx.fill();
   ctx.closePath();
