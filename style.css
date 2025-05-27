@@ -1,4 +1,3 @@
-/* 기본 설정 */
 body {
   margin: 0;
   background-color: #000;
@@ -10,25 +9,22 @@ body {
   height: 100vh;
 }
 
-/* 전체 컨테이너 */
 #container {
   position: relative;
 }
 
-/* 캔버스 */
 canvas#game {
   border: 2px solid #fff;
   background-color: #111;
   display: block;
 }
 
-/* 오버레이 UI */
 #overlay {
   position: absolute;
   top: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* 기본 클릭 비활성화 */
+  pointer-events: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -48,9 +44,8 @@ canvas#game {
   pointer-events: none;
 }
 
-/* 레디 버튼 */
 #readyBtn {
-  pointer-events: auto; /* 클릭 가능하게 */
+  pointer-events: auto;
   padding: 12px 32px;
   font-size: 18px;
   font-weight: bold;
@@ -73,4 +68,11 @@ canvas#game {
   color: #888;
   cursor: not-allowed;
   box-shadow: none;
+}
+
+#countdown {
+  font-size: 48px;
+  color: yellow;
+  font-weight: bold;
+  pointer-events: none;
 }
