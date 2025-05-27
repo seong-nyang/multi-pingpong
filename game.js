@@ -39,7 +39,6 @@ socket.on("state", (state) => {
   players = { ...state.players };
 
   if (player && !isSpectator && players[player.id]) {
-    const serverY = state.players[player.id]?.y ?? localPlayerY;
     players[player.id].y = localPlayerY;
   }
 
@@ -104,7 +103,7 @@ function draw(state) {
     if (player && player.id === id && !isSpectator) {
       ctx.fillStyle = "lime";
       ctx.font = "14px Arial";
-      ctx.fillText("YOU", x - 5, p.y - 60);
+      ctx.fillText("YOU", x - 25, p.y - 60);
       ctx.fillStyle = "white";
     }
   }
