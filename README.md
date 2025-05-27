@@ -27,7 +27,7 @@ cd multi-pingpong-server
 npm install
 node server.js
 ```
-2. 클라이언트 실행
+### 2. 클라이언트 실행
 git clone https://github.com/your-username/multi-pingpong-client.git
 cd multi-pingpong-client
 # index.html을 브라우저로 열거나 GitHub Pages로 배포
