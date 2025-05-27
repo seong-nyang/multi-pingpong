@@ -18,10 +18,12 @@
       <button id="readyBtn">READY</button>
     </div>
 
-    <!-- 채팅 영역 -->
-    <div id="chatBox">
-      <div id="messages"></div>
-      <input id="chatInput" placeholder="채팅을 입력하세요..." />
+    <div id="chat">
+      <div id="chatLog"></div>
+      <form id="chatForm">
+        <input type="text" id="chatInput" placeholder="메시지 입력..." autocomplete="off" />
+        <button>전송</button>
+      </form>
     </div>
   </div>
 </body>

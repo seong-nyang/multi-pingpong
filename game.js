@@ -8,9 +8,9 @@ const ctx = canvas.getContext("2d");
 const scoreDiv = document.getElementById("score");
 const statusDiv = document.getElementById("status");
 const readyBtn = document.getElementById("readyBtn");
-
-const messagesDiv = document.getElementById("messages");
+const chatForm = document.getElementById("chatForm");
 const chatInput = document.getElementById("chatInput");
+const chatLog = document.getElementById("chatLog");
 
 let player = null;
 let gameStarted = false;
@@ -21,7 +21,6 @@ let nicknames = {};
 socket.on("init", (data) => {
   player = data;
   players[player.id] = { y: player.y, side: player.side };
-  nicknames = data.nicknames;
 });
 
 socket.on("full", () => {
@@ -30,16 +29,19 @@ socket.on("full", () => {
 
 socket.on("state", (state) => {
   players = { ...state.players };
-  nicknames = state.nicknames;
+  nicknames = state.nicknames || {};
 
   if (player && players[player.id]) {
-    const serverY = players[player.id]?.y ?? localPlayerY;
+    const serverY = state.players[player.id]?.y ?? localPlayerY;
     players[player.id].y = localPlayerY;
   }
 
   draw(state);
+
   scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
-  statusDiv.textContent = state.started ? "" : "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
+  statusDiv.textContent = state.started
+    ? ""
+    : "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
 
   if (state.winner) {
     statusDiv.textContent = `게임 종료! 승자: ${state.winner}`;
@@ -49,14 +51,13 @@ socket.on("state", (state) => {
   }
 });
 
-socket.on("start", () => {
-  gameStarted = true;
-});
-
 document.addEventListener("mousemove", (e) => {
   if (!gameStarted) return;
+
   const rect = canvas.getBoundingClientRect();
-  localPlayerY = Math.min(Math.max(e.clientY - rect.top, 50), 350);
+  const y = e.clientY - rect.top;
+  localPlayerY = Math.min(Math.max(y, 50), 350);
+
   socket.emit("move", localPlayerY);
 });
 
@@ -66,44 +67,44 @@ readyBtn.addEventListener("click", () => {
   readyBtn.textContent = "READY 완료!";
 });
 
-chatInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && chatInput.value.trim() !== "") {
-    socket.emit("chat", chatInput.value.trim());
-    chatInput.value = "";
-  }
+socket.on("start", () => {
+  gameStarted = true;
 });
 
-socket.on("chat", ({ nickname, message }) => {
-  const div = document.createElement("div");
-  div.textContent = `${nickname}: ${message}`;
-  messagesDiv.appendChild(div);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+chatForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const msg = chatInput.value.trim();
+  if (msg) socket.emit("chat", msg);
+  chatInput.value = "";
+});
+
+socket.on("chat", ({ name, message }) => {
+  const msgElem = document.createElement("div");
+  msgElem.textContent = `${name}: ${message}`;
+  chatLog.appendChild(msgElem);
+  chatLog.scrollTop = chatLog.scrollHeight;
 });
 
 function draw(state) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
   ctx.fillStyle = "white";
+
   for (let id in players) {
     const p = players[id];
-    const x = p.side === "left" ? 10 : canvas.width - 20;
-    const y = p.y - 50;
-    ctx.fillRect(x, y, 10, 100);
+    let x = p.side === "left" ? 10 : canvas.width - 20;
+    ctx.fillRect(x, p.y - 50, 10, 100);
 
-    if (player && id === player.id) {
-      ctx.font = "12px Arial";
-      ctx.fillStyle = "yellow";
-      ctx.textAlign = p.side === "left" ? "left" : "right";
-      ctx.fillText("YOU", p.side === "left" ? x + 12 : x - 4, y - 5);
-      ctx.fillStyle = "white";
-    }
+    // YOU 또는 닉네임 표시
+    const label = id === player.id ? "YOU" : nicknames[id] || "익명?";
+    const textX = p.side === "left" ? x + 15 : x - 60;
+    ctx.font = "14px Arial";
+    ctx.fillText(label, textX, p.y);
   }
 
   ctx.beginPath();
   ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI * 2);
-  ctx.fillStyle = "white";
   ctx.fill();
   ctx.closePath();
 }
