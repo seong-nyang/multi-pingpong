@@ -42,6 +42,8 @@ canvas#game {
   margin-bottom: 24px;
   color: #ccc;
   pointer-events: none;
+  text-align: center;
+  max-width: 80%;
 }
 
 #readyBtn {
@@ -73,12 +75,12 @@ canvas#game {
 #chat {
   position: absolute;
   top: 10px;
-  right: -260px;
-  width: 240px;
+  right: -270px;
+  width: 250px;
   height: 380px;
   display: flex;
   flex-direction: column;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.8);
   border-left: 2px solid #fff;
   padding: 10px;
   box-sizing: border-box;
@@ -94,11 +96,11 @@ canvas#game {
   gap: 4px;
 }
 
-.chat-message {
+#messages .message {
   background-color: #222;
   padding: 4px 6px;
-  border-radius: 6px;
-  word-break: break-word;
+  border-radius: 4px;
+  word-wrap: break-word;
 }
 
 #chatInput {
@@ -107,4 +109,6 @@ canvas#game {
   font-size: 14px;
   border: none;
   border-radius: 5px;
+  background-color: #333;
+  color: white;
 }

@@ -47,7 +47,18 @@ socket.on("state", (state) => {
   scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
 
   if (!state.started) {
-    statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
+    const playerCount = Object.keys(state.players).length;
+    if (playerCount < 2) {
+      statusDiv.textContent = "상대를 기다리는 중...";
+      readyBtn.disabled = true;
+      readyBtn.textContent = "READY";
+    } else {
+      statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
+      if (!viewer && !gameStarted) {
+        readyBtn.disabled = false;
+        readyBtn.textContent = "READY";
+      }
+    }
   } else {
     statusDiv.textContent = "";
   }
@@ -67,8 +78,8 @@ socket.on("start", () => {
 socket.on("chat", ({ id, msg }) => {
   const name = nicknames[id] || "익명?";
   const p = document.createElement("div");
-  p.className = "chat-message";
-  p.textContent = `${name}: ${msg}`;
+  p.className = "message";
+  p.innerHTML = `<strong>${name}</strong>: ${msg}`;
   messagesDiv.appendChild(p);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 });
