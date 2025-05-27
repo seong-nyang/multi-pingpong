@@ -31,42 +31,42 @@ canvas#game {
   justify-content: center;
 }
 
-#score, #status, #role, #countdown {
+#score {
+  font-size: 28px;
+  margin-bottom: 16px;
+  pointer-events: none;
+}
+
+#status {
   font-size: 20px;
-  margin: 6px 0;
+  margin-bottom: 24px;
+  color: #ccc;
   pointer-events: none;
 }
 
 #countdown {
+  font-size: 80px;
+  font-weight: bold;
+  color: #0f0;
+  pointer-events: none;
   position: absolute;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 72px;
-  font-weight: bold;
-  color: yellow;
-  pointer-events: none;
-  z-index: 10;
+  transform: translateY(-50%);
 }
 
-.label {
-  position: absolute;
-  font-size: 18px;
-  font-weight: bold;
-  color: red;
-  pointer-events: none;
-  z-index: 10;
+.hidden {
+  display: none;
 }
 
 #readyBtn {
   pointer-events: auto;
-  padding: 12px 32px;
-  font-size: 18px;
+  padding: 14px 36px;
+  font-size: 20px;
   font-weight: bold;
   background-color: #0f0;
   color: #000;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
   box-shadow: 0 0 10px #0f0;
