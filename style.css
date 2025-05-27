@@ -11,6 +11,8 @@ body {
 
 #container {
   position: relative;
+  display: flex;
+  gap: 16px;
 }
 
 canvas#game {
@@ -19,12 +21,11 @@ canvas#game {
   display: block;
 }
 
-/* 오버레이 UI */
 #overlay {
   position: absolute;
   top: 0;
-  width: 100%;
-  height: 100%;
+  width: 600px;
+  height: 400px;
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -58,12 +59,10 @@ canvas#game {
   transition: background-color 0.3s ease, transform 0.2s ease;
   box-shadow: 0 0 10px #0f0;
 }
-
 #readyBtn:hover {
   background-color: #0c0;
   transform: scale(1.05);
 }
-
 #readyBtn:disabled {
   background-color: #444;
   color: #888;
@@ -71,45 +70,26 @@ canvas#game {
   box-shadow: none;
 }
 
-/* 채팅창 */
-#chat {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  width: 250px;
-  background: #222;
-  border: 1px solid #555;
-  border-radius: 10px;
-  overflow: hidden;
+#chatBox {
+  width: 200px;
+  height: 400px;
+  background-color: #222;
   display: flex;
   flex-direction: column;
+  border: 2px solid #fff;
+  border-radius: 8px;
+  padding: 8px;
 }
 
-#chatWindow {
-  height: 150px;
+#messages {
+  flex: 1;
   overflow-y: auto;
-  padding: 10px;
   font-size: 14px;
-  border-bottom: 1px solid #555;
-}
-
-#chatForm {
-  display: flex;
-  border-top: 1px solid #444;
+  margin-bottom: 8px;
 }
 
 #chatInput {
-  flex: 1;
+  padding: 6px;
   border: none;
-  padding: 8px;
-  background: #333;
-  color: white;
-}
-
-#chatForm button {
-  background: #0f0;
-  color: #000;
-  border: none;
-  padding: 8px 12px;
-  cursor: pointer;
+  border-radius: 4px;
 }
