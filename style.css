@@ -72,23 +72,23 @@ canvas#game {
 
 #chat {
   position: absolute;
-  right: -220px;
+  right: -300px;
   top: 0;
-  width: 200px;
+  width: 300px;
   height: 100%;
-  background: #111;
-  border-left: 2px solid #444;
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 8px;
   box-sizing: border-box;
+  border-left: 2px solid #333;
 }
 
-#chatLog {
+#chatWindow {
   flex: 1;
   overflow-y: auto;
-  font-size: 14px;
   margin-bottom: 8px;
+  font-size: 14px;
 }
 
 #chatForm {
@@ -98,13 +98,20 @@ canvas#game {
 
 #chatInput {
   flex: 1;
-  padding: 4px;
+  padding: 6px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: none;
+  outline: none;
 }
 
 #chatForm button {
-  padding: 4px 8px;
-  background: #0f0;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  background-color: #0f0;
   color: #000;
   border: none;
+  border-radius: 4px;
   cursor: pointer;
 }
