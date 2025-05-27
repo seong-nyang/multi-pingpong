@@ -8,26 +8,23 @@ const ctx = canvas.getContext("2d");
 const scoreDiv = document.getElementById("score");
 const statusDiv = document.getElementById("status");
 const readyBtn = document.getElementById("readyBtn");
-const messagesDiv = document.getElementById("messages");
+
+const chatForm = document.getElementById("chatForm");
 const chatInput = document.getElementById("chatInput");
+const chatWindow = document.getElementById("chatWindow");
 
 let player = null;
 let gameStarted = false;
 let localPlayerY = 200;
 let players = {};
-let nicknames = {};
-let viewer = false;
 
 socket.on("init", (data) => {
   player = data;
-  viewer = data.side === "viewer";
-  if (viewer) {
-    readyBtn.style.display = "none";
-  }
+  players[player.id] = { y: player.y, side: player.side };
 });
 
-socket.on("nicknames", (list) => {
-  nicknames = list;
+socket.on("full", () => {
+  alert("방이 가득 찼습니다.");
 });
 
 socket.on("state", (state) => {
@@ -38,27 +35,14 @@ socket.on("state", (state) => {
     players[player.id].y = players[player.id].y
       ? players[player.id].y * 0.8 + serverY * 0.2
       : serverY;
-
     players[player.id].y = localPlayerY;
   }
 
   draw(state);
 
   scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
-
   if (!state.started) {
-    const playerCount = Object.keys(state.players).length;
-    if (playerCount < 2) {
-      statusDiv.textContent = "상대를 기다리는 중...";
-      readyBtn.disabled = true;
-      readyBtn.textContent = "READY";
-    } else {
-      statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
-      if (!viewer && !gameStarted) {
-        readyBtn.disabled = false;
-        readyBtn.textContent = "READY";
-      }
-    }
+    statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
   } else {
     statusDiv.textContent = "";
   }
@@ -71,21 +55,9 @@ socket.on("state", (state) => {
   }
 });
 
-socket.on("start", () => {
-  gameStarted = true;
-});
-
-socket.on("chat", ({ id, msg }) => {
-  const name = nicknames[id] || "익명?";
-  const p = document.createElement("div");
-  p.className = "message";
-  p.innerHTML = `<strong>${name}</strong>: ${msg}`;
-  messagesDiv.appendChild(p);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
-});
-
 document.addEventListener("mousemove", (e) => {
-  if (!gameStarted || viewer) return;
+  if (!gameStarted) return;
+
   const rect = canvas.getBoundingClientRect();
   const y = e.clientY - rect.top;
   localPlayerY = Math.min(Math.max(y, 50), 350);
@@ -98,11 +70,25 @@ readyBtn.addEventListener("click", () => {
   readyBtn.textContent = "READY 완료!";
 });
 
-chatInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && chatInput.value.trim()) {
-    socket.emit("chat", chatInput.value.trim());
+socket.on("start", () => {
+  gameStarted = true;
+});
+
+// 채팅 이벤트
+chatForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const msg = chatInput.value.trim();
+  if (msg) {
+    socket.emit("chat", msg);
     chatInput.value = "";
   }
+});
+
+socket.on("chat", (msg) => {
+  const div = document.createElement("div");
+  div.textContent = msg;
+  chatWindow.appendChild(div);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
 });
 
 function draw(state) {
@@ -113,16 +99,8 @@ function draw(state) {
   ctx.fillStyle = "white";
   for (let id in players) {
     const p = players[id];
-    const x = p.side === "left" ? 10 : p.side === "right" ? canvas.width - 20 : null;
-    if (x === null) continue;
+    let x = p.side === "left" ? 10 : canvas.width - 20;
     ctx.fillRect(x, p.y - 50, 10, 100);
-
-    if (player && id === player.id) {
-      ctx.fillStyle = "lime";
-      ctx.font = "bold 14px sans-serif";
-      ctx.fillText("YOU", x, p.y - 60);
-      ctx.fillStyle = "white";
-    }
   }
 
   ctx.beginPath();
