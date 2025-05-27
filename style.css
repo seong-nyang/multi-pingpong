@@ -31,17 +31,16 @@ canvas#game {
   justify-content: center;
 }
 
-#score {
-  font-size: 24px;
-  margin-bottom: 16px;
+#score, #status, #role, #countdown {
+  font-size: 20px;
+  margin: 6px 0;
   pointer-events: none;
 }
 
-#status {
-  font-size: 18px;
-  margin-bottom: 24px;
-  color: #ccc;
-  pointer-events: none;
+#countdown {
+  font-size: 48px;
+  font-weight: bold;
+  color: #0f0;
 }
 
 #readyBtn {
@@ -68,11 +67,4 @@ canvas#game {
   color: #888;
   cursor: not-allowed;
   box-shadow: none;
-}
-
-#countdown {
-  font-size: 48px;
-  color: yellow;
-  font-weight: bold;
-  pointer-events: none;
 }
