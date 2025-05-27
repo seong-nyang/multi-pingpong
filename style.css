@@ -1,28 +1,24 @@
-/* 기본 설정 */
 body {
   margin: 0;
   background-color: #000;
   font-family: 'Segoe UI', sans-serif;
   color: white;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   height: 100vh;
 }
 
-/* 전체 컨테이너 */
 #container {
   position: relative;
 }
 
-/* 캔버스 */
 canvas#game {
   border: 2px solid #fff;
   background-color: #111;
   display: block;
 }
 
-/* 오버레이 UI */
 #overlay {
   position: absolute;
   top: 0;
@@ -37,18 +33,26 @@ canvas#game {
 
 #score {
   font-size: 24px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   pointer-events: none;
 }
 
 #status {
   font-size: 18px;
-  margin-bottom: 24px;
   color: #ccc;
+  margin-bottom: 8px;
+  pointer-events: none;
+  text-align: center;
+}
+
+#countdown {
+  font-size: 48px;
+  font-weight: bold;
+  color: #0f0;
+  margin-bottom: 16px;
   pointer-events: none;
 }
 
-/* 레디 버튼 */
 #readyBtn {
   pointer-events: auto;
   padding: 12px 32px;
@@ -75,26 +79,15 @@ canvas#game {
   box-shadow: none;
 }
 
-/* 채팅 */
-#chat {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  width: 200px;
-  background-color: rgba(0,0,0,0.5);
-  padding: 10px;
-  border-radius: 5px;
+#chatBox {
+  width: 600px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  background-color: #222;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-#chatMessages {
-  height: 100px;
-  overflow-y: auto;
-  margin-bottom: 5px;
-  font-size: 14px;
-}
-
-#chatInput {
-  width: 100%;
-  padding: 5px;
-  font-size: 14px;
-}
+#messages {
+  height: 120
