@@ -8,22 +8,20 @@ const ctx = canvas.getContext("2d");
 const scoreDiv = document.getElementById("score");
 const statusDiv = document.getElementById("status");
 const readyBtn = document.getElementById("readyBtn");
-const countdownDiv = document.getElementById("countdown");
 
 let player = null;
-let localPlayerY = 200;
-let players = {};
 let gameStarted = false;
 let isSpectator = false;
 
+let localPlayerY = 200;
+let players = {};
+
 socket.on("init", (data) => {
-  if (data.spectator) {
+  player = data;
+  if (data.side === 'spectator') {
     isSpectator = true;
+    readyBtn.style.display = 'none';
     statusDiv.textContent = "관전자 모드입니다.";
-    readyBtn.style.display = "none";
-  } else {
-    player = data;
-    players[player.id] = { y: player.y, side: player.side };
   }
 });
 
@@ -31,15 +29,20 @@ socket.on("full", () => {
   alert("방이 가득 찼습니다.");
 });
 
+socket.on("countdown", (number) => {
+  statusDiv.textContent = number > 0 ? `게임 시작까지: ${number}` : "";
+});
+
+socket.on("start", () => {
+  gameStarted = true;
+  statusDiv.textContent = "";
+});
+
 socket.on("state", (state) => {
   players = { ...state.players };
 
-  if (player && players[player.id]) {
-    const serverY = state.players[player.id]?.y ?? localPlayerY;
-    players[player.id].y = players[player.id].y
-      ? players[player.id].y * 0.8 + serverY * 0.2
-      : serverY;
-
+  if (player && !isSpectator && players[player.id]) {
+    const serverY = players[player.id]?.y ?? localPlayerY;
     players[player.id].y = localPlayerY;
   }
 
@@ -48,9 +51,9 @@ socket.on("state", (state) => {
   scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
 
   if (!state.started) {
-    statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
-  } else {
-    statusDiv.textContent = "";
+    if (!isSpectator) {
+      statusDiv.textContent = "게임 대기 중... 두 플레이어가 READY를 누르면 시작됩니다.";
+    }
   }
 
   if (state.winner) {
@@ -61,17 +64,9 @@ socket.on("state", (state) => {
   }
 });
 
-socket.on("countdown", (num) => {
-  countdownDiv.textContent = num > 0 ? num : "";
-});
-
-socket.on("start", () => {
-  gameStarted = true;
-  countdownDiv.textContent = "";
-});
-
 document.addEventListener("mousemove", (e) => {
   if (!gameStarted || isSpectator) return;
+
   const rect = canvas.getBoundingClientRect();
   const y = e.clientY - rect.top;
   localPlayerY = Math.min(Math.max(y, 50), 350);
@@ -95,8 +90,8 @@ function draw(state) {
     let x = p.side === "left" ? 10 : canvas.width - 20;
     ctx.fillRect(x, p.y - 50, 10, 100);
 
-    // "YOU" 텍스트 표시
-    if (id === player?.id) {
+    // 조종 중인 패들 표시
+    if (id === player?.id && !isSpectator) {
       ctx.fillStyle = "lime";
       ctx.font = "14px Arial";
       ctx.fillText("YOU", x, p.y - 60);
