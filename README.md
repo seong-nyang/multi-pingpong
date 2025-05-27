@@ -20,16 +20,13 @@ Socket.IO를 이용한 Node.js 기반 멀티플레이 게임으로 브라우저�
 
 ## 📦 설치 및 실행 방법 (로컬 개발용)
 
-### 1. 서버 설치
+서버 설치
 ```bash
 git clone https://github.com/your-username/multi-pingpong-server.git
 cd multi-pingpong-server
 npm install
 node server.js
 ```
-### 2. 클라이언트 실행
-git clone https://github.com/your-username/multi-pingpong-client.git
-cd multi-pingpong-client
 # index.html을 브라우저로 열거나 GitHub Pages로 배포
 
 ⚠️ .js 코드 내 socket.io 연결 주소는 실제 배포된 서버 주소로 설정되어 있어야 합니다.
