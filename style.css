@@ -1,3 +1,4 @@
+/* 기본 설정 */
 body {
   margin: 0;
   background-color: #000;
@@ -9,16 +10,19 @@ body {
   height: 100vh;
 }
 
+/* 전체 컨테이너 */
 #container {
   position: relative;
 }
 
+/* 캔버스 */
 canvas#game {
   border: 2px solid #fff;
   background-color: #111;
   display: block;
 }
 
+/* 오버레이 UI */
 #overlay {
   position: absolute;
   top: 0;
@@ -44,14 +48,7 @@ canvas#game {
   pointer-events: none;
 }
 
-#countdown {
-  font-size: 64px;
-  font-weight: bold;
-  color: white;
-  text-shadow: 0 0 10px #0f0;
-  margin-bottom: 24px;
-}
-
+/* 레디 버튼 */
 #readyBtn {
   pointer-events: auto;
   padding: 12px 32px;
@@ -76,4 +73,28 @@ canvas#game {
   color: #888;
   cursor: not-allowed;
   box-shadow: none;
+}
+
+/* 채팅 */
+#chat {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 200px;
+  background-color: rgba(0,0,0,0.5);
+  padding: 10px;
+  border-radius: 5px;
+}
+
+#chatMessages {
+  height: 100px;
+  overflow-y: auto;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+#chatInput {
+  width: 100%;
+  padding: 5px;
+  font-size: 14px;
 }

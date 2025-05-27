@@ -2,9 +2,9 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>멀티 핑퐁 게임</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
   <script defer src="game.js"></script>
 </head>
@@ -14,8 +14,11 @@
     <div id="overlay">
       <div id="score">점수: 0 - 0</div>
       <div id="status">게임 대기 중...</div>
-      <div id="countdown"></div>
       <button id="readyBtn">READY</button>
+    </div>
+    <div id="chat">
+      <div id="chatMessages"></div>
+      <input type="text" id="chatInput" placeholder="메시지를 입력하세요..."/>
     </div>
   </div>
 </body>
