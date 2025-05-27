@@ -80,11 +80,11 @@ function draw(state) {
     const x = p.side === "left" ? 10 : canvas.width - 20;
     ctx.fillRect(x, p.y - 50, 10, 100);
 
-    // 본인 표시
     if (id === player?.id && player.side !== 'viewer') {
       ctx.fillStyle = "yellow";
       ctx.font = "14px Arial";
-      ctx.fillText("YOU", x - 2, p.y - 60);
+      const textX = p.side === "left" ? x : x - 28;
+      ctx.fillText("YOU", textX, p.y - 60);
       ctx.fillStyle = "white";
     }
   }
@@ -93,3 +93,4 @@ function draw(state) {
   ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI * 2);
   ctx.fill();
 }
+
