@@ -9,13 +9,9 @@ const scoreDiv = document.getElementById("score");
 const statusDiv = document.getElementById("status");
 const readyBtn = document.getElementById("readyBtn");
 
-// 카운트다운 요소
-const countdownDiv = document.createElement("div");
-countdownDiv.id = "countdown";
-document.getElementById("container").appendChild(countdownDiv);
-
 let player = null;
 let gameStarted = false;
+let isSpectator = false;
 let countdown = null;
 
 let localPlayerY = 200;
@@ -23,11 +19,26 @@ let players = {};
 
 socket.on("init", (data) => {
   player = data;
-  players[player.id] = { y: player.y, side: player.side };
+  isSpectator = data.spectator;
+  if (!isSpectator) {
+    players[player.id] = { y: player.y, side: player.side };
+  } else {
+    readyBtn.style.display = "none";
+    statusDiv.textContent = "관전 모드입니다.";
+  }
 });
 
 socket.on("full", () => {
   alert("방이 가득 찼습니다.");
+});
+
+socket.on("countdown", (num) => {
+  showCountdown(num);
+});
+
+socket.on("start", () => {
+  gameStarted = true;
+  hideCountdown();
 });
 
 socket.on("state", (state) => {
@@ -35,13 +46,16 @@ socket.on("state", (state) => {
 
   if (player && players[player.id]) {
     const serverY = state.players[player.id]?.y ?? localPlayerY;
+    players[player.id].y = players[player.id].y
+      ? players[player.id].y * 0.8 + serverY * 0.2
+      : serverY;
     players[player.id].y = localPlayerY;
   }
 
   draw(state);
 
   scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
-  if (!state.started && !state.winner) {
+  if (!state.started) {
     statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
   } else {
     statusDiv.textContent = "";
@@ -55,26 +69,8 @@ socket.on("state", (state) => {
   }
 });
 
-socket.on("start", () => {
-  gameStarted = false;
-  let count = 3;
-  countdownDiv.textContent = count;
-  countdownDiv.style.display = "block";
-
-  countdown = setInterval(() => {
-    count--;
-    if (count > 0) {
-      countdownDiv.textContent = count;
-    } else {
-      clearInterval(countdown);
-      countdownDiv.style.display = "none";
-      gameStarted = true;
-    }
-  }, 1000);
-});
-
 document.addEventListener("mousemove", (e) => {
-  if (!gameStarted) return;
+  if (!gameStarted || isSpectator) return;
 
   const rect = canvas.getBoundingClientRect();
   const y = e.clientY - rect.top;
@@ -100,10 +96,11 @@ function draw(state) {
     let x = p.side === "left" ? 10 : canvas.width - 20;
     ctx.fillRect(x, p.y - 50, 10, 100);
 
-    if (player && id === player.id) {
-      ctx.fillStyle = "red";
-      ctx.font = "16px Arial";
-      ctx.fillText("YOU", x, p.y - 60);
+    // "YOU" 표시
+    if (player && id === player.id && !isSpectator) {
+      ctx.fillStyle = "yellow";
+      ctx.font = "14px Arial";
+      ctx.fillText("YOU", x - 5, p.y - 60);
       ctx.fillStyle = "white";
     }
   }
@@ -113,4 +110,21 @@ function draw(state) {
   ctx.fillStyle = "white";
   ctx.fill();
   ctx.closePath();
+}
+
+// 카운트다운 표시
+function showCountdown(num) {
+  let countdownDiv = document.getElementById("countdown");
+  if (!countdownDiv) {
+    countdownDiv = document.createElement("div");
+    countdownDiv.id = "countdown";
+    document.getElementById("container").appendChild(countdownDiv);
+  }
+  countdownDiv.textContent = num > 0 ? num : "시작!";
+}
+
+// 카운트다운 제거
+function hideCountdown() {
+  const countdownDiv = document.getElementById("countdown");
+  if (countdownDiv) countdownDiv.remove();
 }
