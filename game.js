@@ -7,6 +7,7 @@ const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const scoreDiv = document.getElementById("score");
 const statusDiv = document.getElementById("status");
+const roleDiv = document.getElementById("role");
 const readyBtn = document.getElementById("readyBtn");
 const leftBtn = document.getElementById("leftBtn");
 const rightBtn = document.getElementById("rightBtn");
@@ -25,6 +26,7 @@ socket.on("init", (data) => {
   player = data;
   viewer = data.side === "viewer";
   updateButtons();
+  updateRoleDisplay();
 });
 
 socket.on("nicknames", (list) => {
@@ -86,7 +88,13 @@ chatInput.addEventListener("keydown", (e) => {
 
 leftBtn.addEventListener("click", () => socket.emit("joinSide", "left"));
 rightBtn.addEventListener("click", () => socket.emit("joinSide", "right"));
-viewerBtn.addEventListener("click", () => socket.emit("joinSide", "viewer"));
+viewerBtn.addEventListener("click", () => {
+  if (gameStarted) {
+    alert("게임 중에는 관전자로 전환할 수 없습니다.");
+    return;
+  }
+  socket.emit("joinSide", "viewer");
+});
 
 readyBtn.addEventListener("click", () => {
   socket.emit("ready");
@@ -98,11 +106,19 @@ socket.on("sideChanged", (data) => {
   player.side = data.side;
   viewer = data.side === "viewer";
   updateButtons();
+  updateRoleDisplay();
 });
 
 function updateButtons() {
   readyBtn.disabled = viewer;
   readyBtn.textContent = "READY";
+}
+
+function updateRoleDisplay() {
+  let roleText = "관전자";
+  if (player.side === "left") roleText = "왼쪽 플레이어";
+  else if (player.side === "right") roleText = "오른쪽 플레이어";
+  roleDiv.textContent = `현재 상태: ${roleText}`;
 }
 
 function draw(state) {
@@ -125,9 +141,6 @@ function draw(state) {
     }
   }
 
-  ctx.beginPath();
-  ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI * 2);
-  ctx.fillStyle = "white";
-  ctx.fill();
-  ctx.closePath();
-}
+  ctx
+::contentReference[oaicite:21]{index=21}
+ 
