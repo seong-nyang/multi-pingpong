@@ -8,36 +8,35 @@ const ctx = canvas.getContext("2d");
 const scoreDiv = document.getElementById("score");
 const statusDiv = document.getElementById("status");
 const readyBtn = document.getElementById("readyBtn");
+const messagesDiv = document.getElementById("messages");
+const chatInput = document.getElementById("chatInput");
+
 const leftBtn = document.getElementById("leftBtn");
 const rightBtn = document.getElementById("rightBtn");
 const viewerBtn = document.getElementById("viewerBtn");
-const messagesDiv = document.getElementById("messages");
-const chatInput = document.getElementById("chatInput");
 
 let player = null;
 let gameStarted = false;
 let localPlayerY = 200;
 let players = {};
 let nicknames = {};
-let viewer = true;
-let mySide = "viewer";
+let side = "viewer";
 
-function updateButtonHighlight() {
-  leftBtn.classList.toggle("active", mySide === "left");
-  rightBtn.classList.toggle("active", mySide === "right");
-  viewerBtn.classList.toggle("active", mySide === "viewer");
+function updateButtonStates() {
+  const buttons = { left: leftBtn, right: rightBtn, viewer: viewerBtn };
+  for (let key in buttons) {
+    buttons[key].classList.remove("active");
+  }
+  if (side) {
+    buttons[side]?.classList.add("active");
+  }
+  readyBtn.disabled = !(side === "left" || side === "right");
 }
 
 socket.on("init", (data) => {
   player = data;
-  mySide = data.side;
-  viewer = mySide === "viewer";
-  updateButtonHighlight();
-  if (viewer) {
-    readyBtn.style.display = "none";
-  } else {
-    readyBtn.style.display = "block";
-  }
+  side = data.side;
+  updateButtonStates();
 });
 
 socket.on("nicknames", (list) => {
@@ -46,13 +45,7 @@ socket.on("nicknames", (list) => {
 
 socket.on("state", (state) => {
   players = { ...state.players };
-
   if (player && players[player.id]) {
-    const serverY = state.players[player.id]?.y ?? localPlayerY;
-    players[player.id].y = players[player.id].y
-      ? players[player.id].y * 0.8 + serverY * 0.2
-      : serverY;
-
     players[player.id].y = localPlayerY;
   }
 
@@ -61,7 +54,7 @@ socket.on("state", (state) => {
   scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
 
   if (!state.started) {
-    statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
+    statusDiv.textContent = "게임 대기 중... 플레이어 입장 후 READY를 눌러주세요.";
   } else {
     statusDiv.textContent = "";
   }
@@ -85,76 +78,3 @@ socket.on("chat", ({ id, msg }) => {
   messagesDiv.appendChild(p);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 });
-
-document.addEventListener("mousemove", (e) => {
-  if (!gameStarted || viewer) return;
-  const rect = canvas.getBoundingClientRect();
-  const y = e.clientY - rect.top;
-  localPlayerY = Math.min(Math.max(y, 50), 350);
-  socket.emit("move", localPlayerY);
-});
-
-readyBtn.addEventListener("click", () => {
-  if (viewer) return;
-  socket.emit("ready");
-  readyBtn.disabled = true;
-  readyBtn.textContent = "READY 완료!";
-});
-
-chatInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && chatInput.value.trim()) {
-    socket.emit("chat", chatInput.value.trim());
-    chatInput.value = "";
-  }
-});
-
-leftBtn.addEventListener("click", () => {
-  socket.emit("joinSide", "left");
-});
-
-rightBtn.addEventListener("click", () => {
-  socket.emit("joinSide", "right");
-});
-
-viewerBtn.addEventListener("click", () => {
-  // 관전은 게임 중에는 불가
-  if (!gameStarted) {
-    socket.emit("joinSide", "viewer");
-  }
-});
-
-socket.on("sideUpdate", (side) => {
-  mySide = side;
-  viewer = side === "viewer";
-  updateButtonHighlight();
-  readyBtn.style.display = viewer ? "none" : "block";
-  readyBtn.disabled = false;
-  readyBtn.textContent = "READY";
-});
-
-function draw(state) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  ctx.fillStyle = "white";
-  for (let id in players) {
-    const p = players[id];
-    const x = p.side === "left" ? 10 : p.side === "right" ? canvas.width - 20 : null;
-    if (x === null) continue;
-    ctx.fillRect(x, p.y - 50, 10, 100);
-
-    if (player && id === player.id) {
-      ctx.fillStyle = "lime";
-      ctx.font = "bold 14px sans-serif";
-      ctx.fillText("YOU", x, p.y - 60);
-      ctx.fillStyle = "white";
-    }
-  }
-
-  ctx.beginPath();
-  ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI * 2);
-  ctx.fillStyle = "white";
-  ctx.fill();
-  ctx.closePath();
-}
