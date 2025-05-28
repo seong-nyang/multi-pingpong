@@ -70,12 +70,12 @@ canvas#game {
   box-shadow: none;
 }
 
-/* 채팅 UI 개선 */
+/* 채팅 UI */
 #chat {
   position: absolute;
   top: 10px;
-  right: -230px;
-  width: 200px;
+  right: -250px;
+  width: 240px;
   height: 380px;
   display: flex;
   flex-direction: column;
