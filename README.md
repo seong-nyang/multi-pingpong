@@ -1,7 +1,7 @@
+
 # 🏓 멀티 플레이어 핑퐁 게임
 
-**실시간 1:1 온라인 핑퐁 게임**  
-Socket.IO를 이용한 Node.js 기반 멀티플레이 게임으로 브라우저에서 친구와 바로 플레이할 수 있습니다!
+이 프로젝트는 Socket.IO를 활용한 실시간 **멀티플레이어 핑퐁 게임**입니다. 웹 브라우저에서 두 명이 플레이하고 나머지 사람은 관전하거나 채팅에 참여할 수 있습니다.
 
 ---
 
@@ -10,50 +10,84 @@ Socket.IO를 이용한 Node.js 기반 멀티플레이 게임으로 브라우저�
 
 ---
 
-## 🛠 사용 기술
+## 📁 프로젝트 구성
 
-- **Frontend**: HTML, CSS, JavaScript (Vanilla)  
-- **Backend**: Node.js, Express, Socket.IO  
-- **배포**: GitHub Pages (프론트엔드) + Heroku (백엔드)
+```
+multi-pingpong/
+├── client/
+│   ├── index.html         # 클라이언트 HTML
+│   ├── style.css          # 게임 및 UI 스타일
+│   └── game.js            # 클라이언트 게임 로직
+├── server/
+│   └── index.js           # Node.js + Socket.IO 서버
+└── README.md              # 프로젝트 설명 문서
+```
 
 ---
 
-## 📦 설치 및 실행 방법 (로컬 개발용)
+## 🚀 실행 방법
 
-서버 설치
+### 1. 서버 실행
+
 ```bash
-git clone https://github.com/your-username/multi-pingpong-server.git
-cd multi-pingpong-server
 npm install
-node server.js
+node index.js
 ```
-# index.html을 브라우저로 열거나 GitHub Pages로 배포
 
-⚠️ .js 코드 내 socket.io 연결 주소는 실제 배포된 서버 주소로 설정되어 있어야 합니다.
+서버는 로컬에서는 기본적으로 **http://localhost:3000**에서 실행됩니다.
+
+### 2. 클라이언트 접속
+
+`index.html`을 웹 브라우저에서 열면 됩니다. 게임은 다음 주소의 서버와 연결됩니다:
+
+```
+https://multi-pingpong-293cc4ba4236.herokuapp.com
+```
+
+> 서버 URL은 `game.js`에서 변경 가능합니다.
 
 ---
 
-## 🎮 게임 방법
-두 명이 각각 접속하면 자동으로 좌우 플레이어로 배정됩니다.
+## 🕹️ 게임 방법
 
-READY 버튼을 누르면 대기 상태로 진입합니다.
+### 플레이어 입장
 
-양쪽 모두 READY를 누르면 게임이 시작됩니다.
+- **왼쪽 입장**, **오른쪽 입장**, **관전** 중 선택할 수 있습니다.
+- 입장 후 **READY** 버튼을 누르면 게임이 시작됩니다.
+- 마우스 커서를 상하로 움직여 패들을 조작할 수 있습니다.
 
-마우스를 위아래로 움직여 패들을 조작할 수 있습니다..
+### 승리 조건
 
-먼저 10점을 득점한 쪽이 승리합니다!
+- 먼저 **5점**을 얻는 쪽이 승리합니다.
+- 게임이 끝나면 다시 `READY` 버튼을 눌러 새로운 게임을 시작할 수 있습니다.
 
 ---
 
-## 📁 파일 구성
-```
-multi-pingpong-client/
-├── index.html          # 메인 HTML
-├── style.css           # 게임 UI 스타일
-├── game.js             # 클라이언트 로직 및 Socket.IO 통신
-└── README.md           # 이 문서
-```
+## 💬 채팅 기능
+
+오른쪽 채팅창에서 실시간 메시지를 주고받을 수 있습니다.
+- 자동으로 익명 닉네임이 부여됩니다 (`익명_ABCD` 형식).
+- 닉네임은 로컬스토리지에 저장됩니다.
+
+---
+
+## ⚙️ 기술 스택
+
+- **Frontend**: HTML, CSS, JavaScript (Vanilla)
+- **Backend**: Node.js, Express, Socket.IO
+- **배포**: Heroku (또는 직접 서버 실행)
+
+---
+
+## ✨ 기능 요약
+
+- 실시간 멀티플레이어 게임
+- 관전자 모드
+- 닉네임 시스템 (로컬 저장)
+- 실시간 채팅
+- 승점/점수판 UI
+- 재시작 기능
+
 ---
 
 ## 📮 라이선스 & 사용
