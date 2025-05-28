@@ -39,9 +39,33 @@ canvas#game {
 
 #status {
   font-size: 18px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   color: #ccc;
   pointer-events: none;
+}
+
+#joinButtons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  pointer-events: auto;
+}
+
+#joinLeftBtn, #joinRightBtn {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #008cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+#joinLeftBtn:hover, #joinRightBtn:hover {
+  background-color: #0070cc;
+  transform: scale(1.05);
 }
 
 #readyBtn {
@@ -58,7 +82,7 @@ canvas#game {
   box-shadow: 0 0 10px #0f0;
 }
 
-#readyBtn:hover {
+#readyBtn:hover:enabled {
   background-color: #0c0;
   transform: scale(1.05);
 }

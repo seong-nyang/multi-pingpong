@@ -8,6 +8,8 @@ const ctx = canvas.getContext("2d");
 const scoreDiv = document.getElementById("score");
 const statusDiv = document.getElementById("status");
 const readyBtn = document.getElementById("readyBtn");
+const joinLeftBtn = document.getElementById("joinLeftBtn");
+const joinRightBtn = document.getElementById("joinRightBtn");
 const messagesDiv = document.getElementById("messages");
 const chatInput = document.getElementById("chatInput");
 
@@ -16,14 +18,12 @@ let gameStarted = false;
 let localPlayerY = 200;
 let players = {};
 let nicknames = {};
-let viewer = false;
+let viewer = true;
 
 socket.on("init", (data) => {
   player = data;
-  viewer = data.side === "viewer";
-  if (viewer) {
-    readyBtn.style.display = "none";
-  }
+  viewer = true; // 초기 상태는 관전자
+  updateJoinButtons(true);
 });
 
 socket.on("nicknames", (list) => {
@@ -47,7 +47,8 @@ socket.on("state", (state) => {
   scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
 
   if (!state.started) {
-    statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
+    statusDiv.textContent = "게임 대기 중... READY를 눌러 시작하세요.";
+    readyBtn.disabled = !state.players[player?.id];
   } else {
     statusDiv.textContent = "";
   }
@@ -62,6 +63,7 @@ socket.on("state", (state) => {
 
 socket.on("start", () => {
   gameStarted = true;
+  readyBtn.textContent = "READY 완료!";
 });
 
 socket.on("chat", ({ id, msg }) => {
@@ -70,6 +72,12 @@ socket.on("chat", ({ id, msg }) => {
   p.textContent = `${name}: ${msg}`;
   messagesDiv.appendChild(p);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
+});
+
+socket.on("joined", (side) => {
+  viewer = false;
+  updateJoinButtons(false);
+  readyBtn.style.display = "inline-block";
 });
 
 document.addEventListener("mousemove", (e) => {
@@ -86,12 +94,24 @@ readyBtn.addEventListener("click", () => {
   readyBtn.textContent = "READY 완료!";
 });
 
+joinLeftBtn.addEventListener("click", () => {
+  socket.emit("join", "left");
+});
+
+joinRightBtn.addEventListener("click", () => {
+  socket.emit("join", "right");
+});
+
 chatInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && chatInput.value.trim()) {
     socket.emit("chat", chatInput.value.trim());
     chatInput.value = "";
   }
 });
+
+function updateJoinButtons(visible) {
+  document.getElementById("joinButtons").style.display = visible ? "flex" : "none";
+}
 
 function draw(state) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
