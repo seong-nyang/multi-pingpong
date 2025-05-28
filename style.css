@@ -74,17 +74,16 @@ canvas#game {
 #chat {
   position: absolute;
   top: 10px;
-  right: -240px;
-  width: 220px;
+  right: -230px;
+  width: 200px;
   height: 380px;
   display: flex;
   flex-direction: column;
-  background-color: rgba(20, 20, 20, 0.9);
-  border-left: 2px solid #fff;
+  background-color: rgba(20, 20, 20, 0.85);
+  border-left: 2px solid #0f0;
+  border-radius: 10px;
   padding: 10px;
   box-sizing: border-box;
-  border-radius: 8px;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
 }
 
 #messages {
@@ -92,16 +91,27 @@ canvas#game {
   overflow-y: auto;
   font-size: 14px;
   margin-bottom: 5px;
-  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #0f0 transparent;
+}
+
+#messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+#messages::-webkit-scrollbar-thumb {
+  background-color: #0f0;
+  border-radius: 3px;
 }
 
 #messages div {
-  margin-bottom: 4px;
-  background-color: #222;
-  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 5px 8px;
   border-radius: 6px;
-  color: #0f0;
-  word-wrap: break-word;
+  word-break: break-word;
 }
 
 #chatInput {
@@ -110,6 +120,6 @@ canvas#game {
   font-size: 14px;
   border: none;
   border-radius: 6px;
-  background-color: #333;
+  background-color: #222;
   color: white;
 }
