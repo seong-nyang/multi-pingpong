@@ -20,11 +20,24 @@ let localPlayerY = 200;
 let players = {};
 let nicknames = {};
 let viewer = true;
+let mySide = "viewer";
+
+function updateButtonHighlight() {
+  leftBtn.classList.toggle("active", mySide === "left");
+  rightBtn.classList.toggle("active", mySide === "right");
+  viewerBtn.classList.toggle("active", mySide === "viewer");
+}
 
 socket.on("init", (data) => {
   player = data;
-  viewer = data.side === "viewer";
-  updateReadyState();
+  mySide = data.side;
+  viewer = mySide === "viewer";
+  updateButtonHighlight();
+  if (viewer) {
+    readyBtn.style.display = "none";
+  } else {
+    readyBtn.style.display = "block";
+  }
 });
 
 socket.on("nicknames", (list) => {
@@ -48,7 +61,7 @@ socket.on("state", (state) => {
   scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
 
   if (!state.started) {
-    statusDiv.textContent = "게임 대기 중... 입장 후 READY를 눌러주세요.";
+    statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
   } else {
     statusDiv.textContent = "";
   }
@@ -82,39 +95,10 @@ document.addEventListener("mousemove", (e) => {
 });
 
 readyBtn.addEventListener("click", () => {
+  if (viewer) return;
   socket.emit("ready");
   readyBtn.disabled = true;
   readyBtn.textContent = "READY 완료!";
-});
-
-leftBtn.addEventListener("click", () => {
-  socket.emit("join", "left");
-});
-
-rightBtn.addEventListener("click", () => {
-  socket.emit("join", "right");
-});
-
-viewerBtn.addEventListener("click", () => {
-  socket.emit("join", "viewer");
-});
-
-function updateReadyState() {
-  if (!viewer) {
-    readyBtn.disabled = false;
-    readyBtn.textContent = "READY";
-  } else {
-    readyBtn.disabled = true;
-    readyBtn.textContent = "관전자 모드";
-  }
-}
-
-socket.on("joined", ({ id, side }) => {
-  if (player && player.id === id) {
-    player.side = side;
-    viewer = side === "viewer";
-    updateReadyState();
-  }
 });
 
 chatInput.addEventListener("keydown", (e) => {
@@ -122,6 +106,30 @@ chatInput.addEventListener("keydown", (e) => {
     socket.emit("chat", chatInput.value.trim());
     chatInput.value = "";
   }
+});
+
+leftBtn.addEventListener("click", () => {
+  socket.emit("joinSide", "left");
+});
+
+rightBtn.addEventListener("click", () => {
+  socket.emit("joinSide", "right");
+});
+
+viewerBtn.addEventListener("click", () => {
+  // 관전은 게임 중에는 불가
+  if (!gameStarted) {
+    socket.emit("joinSide", "viewer");
+  }
+});
+
+socket.on("sideUpdate", (side) => {
+  mySide = side;
+  viewer = side === "viewer";
+  updateButtonHighlight();
+  readyBtn.style.display = viewer ? "none" : "block";
+  readyBtn.disabled = false;
+  readyBtn.textContent = "READY";
 });
 
 function draw(state) {
