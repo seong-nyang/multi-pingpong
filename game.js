@@ -78,3 +78,66 @@ socket.on("chat", ({ id, msg }) => {
   messagesDiv.appendChild(p);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 });
+document.addEventListener("mousemove", (e) => {
+  if (!gameStarted || side === "viewer") return;
+  const rect = canvas.getBoundingClientRect();
+  const y = e.clientY - rect.top;
+  localPlayerY = Math.min(Math.max(y, 50), 350);
+  socket.emit("move", localPlayerY);
+});
+
+readyBtn.addEventListener("click", () => {
+  socket.emit("ready");
+  readyBtn.disabled = true;
+  readyBtn.textContent = "READY 완료!";
+});
+
+chatInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && chatInput.value.trim()) {
+    socket.emit("chat", chatInput.value.trim());
+    chatInput.value = "";
+  }
+});
+
+leftBtn.addEventListener("click", () => {
+  socket.emit("switch", "left");
+});
+
+rightBtn.addEventListener("click", () => {
+  socket.emit("switch", "right");
+});
+
+viewerBtn.addEventListener("click", () => {
+  socket.emit("switch", "viewer");
+});
+
+socket.on("side", (newSide) => {
+  side = newSide;
+  updateButtonStates();
+});
+
+function draw(state) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "white";
+  for (let id in players) {
+    const p = players[id];
+    const x = p.side === "left" ? 10 : p.side === "right" ? canvas.width - 20 : null;
+    if (x === null) continue;
+    ctx.fillRect(x, p.y - 50, 10, 100);
+    if (player && id === player.id) {
+      ctx.fillStyle = "lime";
+      ctx.font = "bold 14px sans-serif";
+      ctx.fillText("YOU", x, p.y - 60);
+      ctx.fillStyle = "white";
+    }
+  }
+
+  ctx.beginPath();
+  ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI * 2);
+  ctx.fillStyle = "white";
+  ctx.fill();
+  ctx.closePath();
+}
