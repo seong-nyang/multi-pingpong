@@ -22,13 +22,13 @@ let players = {};
 let nicknames = {};
 let side = "viewer";
 
-// ✅ 닉네임 localStorage에서 불러오기 또는 생성
-let storedNickname = localStorage.getItem("nickname");
-if (!storedNickname) {
-  storedNickname = `익명${Math.floor(Math.random() * 10000)}`;
-  localStorage.setItem("nickname", storedNickname);
+// ✅ 닉네임 ID를 로컬스토리지에서 유지
+let nicknameId = localStorage.getItem("nicknameId");
+if (!nicknameId) {
+  nicknameId = "익명_" + Math.random().toString(36).substring(2, 6).toUpperCase();
+  localStorage.setItem("nicknameId", nicknameId);
 }
-socket.emit("setNickname", storedNickname); // 서버에 전달
+socket.emit("registerNickname", nicknameId);
 
 function updateButtonStates() {
   const buttons = { left: leftBtn, right: rightBtn, viewer: viewerBtn };
