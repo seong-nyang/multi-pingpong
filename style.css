@@ -103,8 +103,8 @@ canvas#game {
 #chat {
   position: absolute;
   top: 10px;
-  right: -250px;
-  width: 240px;
+  right: -270px;
+  width: 260px;
   height: 380px;
   display: flex;
   flex-direction: column;

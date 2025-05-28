@@ -22,7 +22,6 @@ let players = {};
 let nicknames = {};
 let side = "viewer";
 
-// ✅ 닉네임 ID를 로컬스토리지에서 유지
 let nicknameId = localStorage.getItem("nicknameId");
 if (!nicknameId) {
   nicknameId = "익명_" + Math.random().toString(36).substring(2, 6).toUpperCase();
