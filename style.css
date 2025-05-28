@@ -70,19 +70,21 @@ canvas#game {
   box-shadow: none;
 }
 
-/* 채팅 UI 오른쪽 고정 */
+/* 채팅 UI 개선 */
 #chat {
   position: absolute;
   top: 10px;
-  right: -230px;
-  width: 200px;
+  right: -240px;
+  width: 220px;
   height: 380px;
   display: flex;
   flex-direction: column;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(20, 20, 20, 0.9);
   border-left: 2px solid #fff;
   padding: 10px;
   box-sizing: border-box;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
 }
 
 #messages {
@@ -90,12 +92,24 @@ canvas#game {
   overflow-y: auto;
   font-size: 14px;
   margin-bottom: 5px;
+  padding-right: 4px;
+}
+
+#messages div {
+  margin-bottom: 4px;
+  background-color: #222;
+  padding: 6px 8px;
+  border-radius: 6px;
+  color: #0f0;
+  word-wrap: break-word;
 }
 
 #chatInput {
   width: 100%;
-  padding: 5px;
+  padding: 6px;
   font-size: 14px;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
+  background-color: #333;
+  color: white;
 }
