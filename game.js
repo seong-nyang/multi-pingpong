@@ -8,33 +8,23 @@ const ctx = canvas.getContext("2d");
 const scoreDiv = document.getElementById("score");
 const statusDiv = document.getElementById("status");
 const readyBtn = document.getElementById("readyBtn");
-const joinLeftBtn = document.getElementById("joinLeftBtn");
-const joinRightBtn = document.getElementById("joinRightBtn");
-const spectateBtn = document.getElementById("spectateBtn");
+const leftBtn = document.getElementById("leftBtn");
+const rightBtn = document.getElementById("rightBtn");
+const viewerBtn = document.getElementById("viewerBtn");
 const messagesDiv = document.getElementById("messages");
 const chatInput = document.getElementById("chatInput");
 
 let player = null;
-let gameStarted = false;
-let localPlayerY = 200;
 let players = {};
 let nicknames = {};
+let localPlayerY = 200;
+let gameStarted = false;
 let viewer = true;
-
-function updateControls() {
-  if (viewer) {
-    readyBtn.style.display = "none";
-  } else {
-    readyBtn.style.display = "inline-block";
-    readyBtn.disabled = false;
-    readyBtn.textContent = "READY";
-  }
-}
 
 socket.on("init", (data) => {
   player = data;
   viewer = data.side === "viewer";
-  updateControls();
+  updateButtons();
 });
 
 socket.on("nicknames", (list) => {
@@ -45,7 +35,7 @@ socket.on("state", (state) => {
   players = { ...state.players };
 
   if (player && players[player.id]) {
-    const serverY = state.players[player.id]?.y ?? localPlayerY;
+    const serverY = players[player.id].y ?? localPlayerY;
     players[player.id].y = localPlayerY;
   }
 
@@ -54,18 +44,16 @@ socket.on("state", (state) => {
   scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
 
   if (!state.started) {
-    statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
+    statusDiv.textContent = "게임 대기 중... 진영에 입장 후 READY를 눌러주세요.";
   } else {
     statusDiv.textContent = "";
   }
 
   if (state.winner) {
     statusDiv.textContent = `게임 종료! 승자: ${state.winner}`;
+    readyBtn.disabled = false;
+    readyBtn.textContent = "다시 시작하려면 READY";
     gameStarted = false;
-    if (!viewer) {
-      readyBtn.disabled = false;
-      readyBtn.textContent = "다시 시작하려면 READY";
-    }
   }
 });
 
@@ -82,29 +70,11 @@ socket.on("chat", ({ id, msg }) => {
 });
 
 document.addEventListener("mousemove", (e) => {
-  if (!gameStarted || viewer) return;
+  if (!gameStarted || viewer || !player || !players[player.id]) return;
   const rect = canvas.getBoundingClientRect();
   const y = e.clientY - rect.top;
   localPlayerY = Math.min(Math.max(y, 50), 350);
   socket.emit("move", localPlayerY);
-});
-
-readyBtn.addEventListener("click", () => {
-  socket.emit("ready");
-  readyBtn.disabled = true;
-  readyBtn.textContent = "READY 완료!";
-});
-
-joinLeftBtn.addEventListener("click", () => {
-  socket.emit("join", "left");
-});
-
-joinRightBtn.addEventListener("click", () => {
-  socket.emit("join", "right");
-});
-
-spectateBtn.addEventListener("click", () => {
-  socket.emit("join", "viewer");
 });
 
 chatInput.addEventListener("keydown", (e) => {
@@ -114,16 +84,37 @@ chatInput.addEventListener("keydown", (e) => {
   }
 });
 
+leftBtn.addEventListener("click", () => socket.emit("joinSide", "left"));
+rightBtn.addEventListener("click", () => socket.emit("joinSide", "right"));
+viewerBtn.addEventListener("click", () => socket.emit("joinSide", "viewer"));
+
+readyBtn.addEventListener("click", () => {
+  socket.emit("ready");
+  readyBtn.disabled = true;
+  readyBtn.textContent = "READY 완료!";
+});
+
+socket.on("sideChanged", (data) => {
+  player.side = data.side;
+  viewer = data.side === "viewer";
+  updateButtons();
+});
+
+function updateButtons() {
+  readyBtn.disabled = viewer;
+  readyBtn.textContent = "READY";
+}
+
 function draw(state) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "white";
   for (let id in players) {
     const p = players[id];
     const x = p.side === "left" ? 10 : p.side === "right" ? canvas.width - 20 : null;
     if (x === null) continue;
+    ctx.fillStyle = "white";
     ctx.fillRect(x, p.y - 50, 10, 100);
 
     if (player && id === player.id) {

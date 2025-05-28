@@ -19,7 +19,7 @@ canvas#game {
   display: block;
 }
 
-#overlay {
+#ui {
   position: absolute;
   top: 0;
   width: 100%;
@@ -33,68 +33,56 @@ canvas#game {
 
 #score {
   font-size: 24px;
-  margin-bottom: 16px;
-  pointer-events: none;
+  margin-bottom: 10px;
 }
 
 #status {
   font-size: 18px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   color: #ccc;
-  pointer-events: none;
 }
 
-#joinButtons {
+#buttons {
   display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-  pointer-events: auto;
+  gap: 10px;
 }
 
-#joinLeftBtn, #joinRightBtn {
+#buttons button {
+  pointer-events: auto;
   padding: 10px 20px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
-  background-color: #008cff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-#joinLeftBtn:hover, #joinRightBtn:hover {
-  background-color: #0070cc;
-  transform: scale(1.05);
-}
-
-#readyBtn {
-  pointer-events: auto;
-  padding: 12px 32px;
-  font-size: 18px;
-  font-weight: bold;
-  background-color: #0f0;
-  color: #000;
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 0 10px #0f0;
+  transition: all 0.3s ease;
 }
 
-#readyBtn:hover:enabled {
-  background-color: #0c0;
-  transform: scale(1.05);
+#leftBtn {
+  background-color: #007bff;
+  color: #fff;
+}
+
+#rightBtn {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+#viewerBtn {
+  background-color: #888;
+  color: #fff;
+}
+
+#readyBtn {
+  background-color: #28a745;
+  color: #fff;
 }
 
 #readyBtn:disabled {
   background-color: #444;
-  color: #888;
   cursor: not-allowed;
-  box-shadow: none;
 }
 
-/* 채팅 UI */
 #chat {
   position: absolute;
   top: 10px;
@@ -118,8 +106,6 @@ canvas#game {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  scrollbar-width: thin;
-  scrollbar-color: #0f0 transparent;
 }
 
 #messages::-webkit-scrollbar {
@@ -135,7 +121,6 @@ canvas#game {
   background: rgba(255, 255, 255, 0.1);
   padding: 5px 8px;
   border-radius: 6px;
-  word-break: break-word;
 }
 
 #chatInput {
