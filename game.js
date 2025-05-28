@@ -22,6 +22,14 @@ let players = {};
 let nicknames = {};
 let side = "viewer";
 
+// ✅ 닉네임 localStorage에서 불러오기 또는 생성
+let storedNickname = localStorage.getItem("nickname");
+if (!storedNickname) {
+  storedNickname = `익명${Math.floor(Math.random() * 10000)}`;
+  localStorage.setItem("nickname", storedNickname);
+}
+socket.emit("setNickname", storedNickname); // 서버에 전달
+
 function updateButtonStates() {
   const buttons = { left: leftBtn, right: rightBtn, viewer: viewerBtn };
   for (let key in buttons) {
@@ -78,6 +86,7 @@ socket.on("chat", ({ id, msg }) => {
   messagesDiv.appendChild(p);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 });
+
 document.addEventListener("mousemove", (e) => {
   if (!gameStarted || side === "viewer") return;
   const rect = canvas.getBoundingClientRect();

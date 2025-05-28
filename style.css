@@ -144,7 +144,7 @@ canvas#game {
 }
 
 #chatInput {
-  width: 100%;
+  width: 95%;
   padding: 6px;
   font-size: 14px;
   border: none;
