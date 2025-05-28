@@ -19,7 +19,7 @@ canvas#game {
   display: block;
 }
 
-#ui {
+#overlay {
   position: absolute;
   top: 0;
   width: 100%;
@@ -33,62 +33,51 @@ canvas#game {
 
 #score {
   font-size: 24px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  pointer-events: none;
 }
 
 #status {
   font-size: 18px;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
   color: #ccc;
-}
-
-#role {
-  font-size: 16px;
-  margin-bottom: 20px;
-  color: #0f0;
+  pointer-events: none;
+  text-align: center;
 }
 
 #buttons {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  pointer-events: auto;
 }
 
 #buttons button {
-  pointer-events: auto;
-  padding: 10px 20px;
-  font-size: 14px;
+  padding: 10px 16px;
+  font-size: 16px;
   font-weight: bold;
-  border: none;
-  border-radius: 10px;
+  background-color: #222;
+  color: #fff;
+  border: 1px solid #0f0;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-#leftBtn {
-  background-color: #007bff;
-  color: #fff;
+#buttons button:hover:not(:disabled) {
+  background-color: #0f0;
+  color: #000;
 }
 
-#rightBtn {
-  background-color: #dc3545;
-  color: #fff;
-}
-
-#viewerBtn {
-  background-color: #888;
-  color: #fff;
-}
-
-#readyBtn {
-  background-color: #28a745;
-  color: #fff;
-}
-
-#readyBtn:disabled {
+#buttons button:disabled {
   background-color: #444;
+  color: #888;
   cursor: not-allowed;
+  border-color: #444;
 }
 
+/* 채팅 UI */
 #chat {
   position: absolute;
   top: 10px;
@@ -112,6 +101,8 @@ canvas#game {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #0f0 transparent;
 }
 
 #messages::-webkit-scrollbar {
@@ -127,6 +118,7 @@ canvas#game {
   background: rgba(255, 255, 255, 0.1);
   padding: 5px 8px;
   border-radius: 6px;
+  word-break: break-word;
 }
 
 #chatInput {

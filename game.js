@@ -1,10 +1,12 @@
-const socket = io();
+const socket = io('https://multi-pingpong-293cc4ba4236.herokuapp.com', {
+  path: '/socket.io',
+  transports: ['websocket']
+});
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const scoreDiv = document.getElementById("score");
 const statusDiv = document.getElementById("status");
-const roleDiv = document.getElementById("role");
 const readyBtn = document.getElementById("readyBtn");
 const leftBtn = document.getElementById("leftBtn");
 const rightBtn = document.getElementById("rightBtn");
@@ -13,17 +15,16 @@ const messagesDiv = document.getElementById("messages");
 const chatInput = document.getElementById("chatInput");
 
 let player = null;
+let gameStarted = false;
+let localPlayerY = 200;
 let players = {};
 let nicknames = {};
-let localPlayerY = 200;
-let gameStarted = false;
 let viewer = true;
 
 socket.on("init", (data) => {
   player = data;
   viewer = data.side === "viewer";
-  updateButtons();
-  updateRoleDisplay();
+  updateReadyState();
 });
 
 socket.on("nicknames", (list) => {
@@ -34,7 +35,11 @@ socket.on("state", (state) => {
   players = { ...state.players };
 
   if (player && players[player.id]) {
-    const serverY = players[player.id].y ?? localPlayerY;
+    const serverY = state.players[player.id]?.y ?? localPlayerY;
+    players[player.id].y = players[player.id].y
+      ? players[player.id].y * 0.8 + serverY * 0.2
+      : serverY;
+
     players[player.id].y = localPlayerY;
   }
 
@@ -43,7 +48,7 @@ socket.on("state", (state) => {
   scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
 
   if (!state.started) {
-    statusDiv.textContent = "게임 대기 중... 진영에 입장 후 READY를 눌러주세요.";
+    statusDiv.textContent = "게임 대기 중... 입장 후 READY를 눌러주세요.";
   } else {
     statusDiv.textContent = "";
   }
@@ -69,11 +74,47 @@ socket.on("chat", ({ id, msg }) => {
 });
 
 document.addEventListener("mousemove", (e) => {
-  if (!gameStarted || viewer || !player || !players[player.id]) return;
+  if (!gameStarted || viewer) return;
   const rect = canvas.getBoundingClientRect();
   const y = e.clientY - rect.top;
   localPlayerY = Math.min(Math.max(y, 50), 350);
   socket.emit("move", localPlayerY);
+});
+
+readyBtn.addEventListener("click", () => {
+  socket.emit("ready");
+  readyBtn.disabled = true;
+  readyBtn.textContent = "READY 완료!";
+});
+
+leftBtn.addEventListener("click", () => {
+  socket.emit("join", "left");
+});
+
+rightBtn.addEventListener("click", () => {
+  socket.emit("join", "right");
+});
+
+viewerBtn.addEventListener("click", () => {
+  socket.emit("join", "viewer");
+});
+
+function updateReadyState() {
+  if (!viewer) {
+    readyBtn.disabled = false;
+    readyBtn.textContent = "READY";
+  } else {
+    readyBtn.disabled = true;
+    readyBtn.textContent = "관전자 모드";
+  }
+}
+
+socket.on("joined", ({ id, side }) => {
+  if (player && player.id === id) {
+    player.side = side;
+    viewer = side === "viewer";
+    updateReadyState();
+  }
 });
 
 chatInput.addEventListener("keydown", (e) => {
@@ -83,51 +124,16 @@ chatInput.addEventListener("keydown", (e) => {
   }
 });
 
-leftBtn.addEventListener("click", () => socket.emit("joinSide", "left"));
-rightBtn.addEventListener("click", () => socket.emit("joinSide", "right"));
-viewerBtn.addEventListener("click", () => {
-  if (gameStarted) {
-    alert("게임 중에는 관전자로 전환할 수 없습니다.");
-    return;
-  }
-  socket.emit("joinSide", "viewer");
-});
-
-readyBtn.addEventListener("click", () => {
-  socket.emit("ready");
-  readyBtn.disabled = true;
-  readyBtn.textContent = "READY 완료!";
-});
-
-socket.on("sideChanged", (data) => {
-  player.side = data.side;
-  viewer = data.side === "viewer";
-  updateButtons();
-  updateRoleDisplay();
-});
-
-function updateButtons() {
-  readyBtn.disabled = viewer;
-  readyBtn.textContent = "READY";
-}
-
-function updateRoleDisplay() {
-  let roleText = "관전자";
-  if (player.side === "left") roleText = "왼쪽 플레이어";
-  else if (player.side === "right") roleText = "오른쪽 플레이어";
-  roleDiv.textContent = `현재 상태: ${roleText}`;
-}
-
 function draw(state) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  ctx.fillStyle = "white";
   for (let id in players) {
     const p = players[id];
     const x = p.side === "left" ? 10 : p.side === "right" ? canvas.width - 20 : null;
     if (x === null) continue;
-    ctx.fillStyle = "white";
     ctx.fillRect(x, p.y - 50, 10, 100);
 
     if (player && id === player.id) {
@@ -142,4 +148,5 @@ function draw(state) {
   ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI * 2);
   ctx.fillStyle = "white";
   ctx.fill();
+  ctx.closePath();
 }
