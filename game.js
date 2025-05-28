@@ -1,7 +1,4 @@
-const socket = io('https://multi-pingpong-293cc4ba4236.herokuapp.com', {
-  path: '/socket.io',
-  transports: ['websocket']
-});
+const socket = io();
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
@@ -141,6 +138,8 @@ function draw(state) {
     }
   }
 
-  ctx
-::contentReference[oaicite:21]{index=21}
- 
+  ctx.beginPath();
+  ctx.arc(state.ball.x, state.ball.y, 10, 0, Math.PI * 2);
+  ctx.fillStyle = "white";
+  ctx.fill();
+}
