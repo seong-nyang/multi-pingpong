@@ -10,6 +10,7 @@ const statusDiv = document.getElementById("status");
 const readyBtn = document.getElementById("readyBtn");
 const joinLeftBtn = document.getElementById("joinLeftBtn");
 const joinRightBtn = document.getElementById("joinRightBtn");
+const spectateBtn = document.getElementById("spectateBtn");
 const messagesDiv = document.getElementById("messages");
 const chatInput = document.getElementById("chatInput");
 
@@ -20,10 +21,20 @@ let players = {};
 let nicknames = {};
 let viewer = true;
 
+function updateControls() {
+  if (viewer) {
+    readyBtn.style.display = "none";
+  } else {
+    readyBtn.style.display = "inline-block";
+    readyBtn.disabled = false;
+    readyBtn.textContent = "READY";
+  }
+}
+
 socket.on("init", (data) => {
   player = data;
-  viewer = true; // 초기 상태는 관전자
-  updateJoinButtons(true);
+  viewer = data.side === "viewer";
+  updateControls();
 });
 
 socket.on("nicknames", (list) => {
@@ -35,10 +46,6 @@ socket.on("state", (state) => {
 
   if (player && players[player.id]) {
     const serverY = state.players[player.id]?.y ?? localPlayerY;
-    players[player.id].y = players[player.id].y
-      ? players[player.id].y * 0.8 + serverY * 0.2
-      : serverY;
-
     players[player.id].y = localPlayerY;
   }
 
@@ -47,23 +54,23 @@ socket.on("state", (state) => {
   scoreDiv.textContent = `점수: ${state.scores.left} - ${state.scores.right}`;
 
   if (!state.started) {
-    statusDiv.textContent = "게임 대기 중... READY를 눌러 시작하세요.";
-    readyBtn.disabled = !state.players[player?.id];
+    statusDiv.textContent = "게임 대기 중... 두 플레이어 모두 READY를 눌러주세요.";
   } else {
     statusDiv.textContent = "";
   }
 
   if (state.winner) {
     statusDiv.textContent = `게임 종료! 승자: ${state.winner}`;
-    readyBtn.disabled = false;
-    readyBtn.textContent = "다시 시작하려면 READY";
     gameStarted = false;
+    if (!viewer) {
+      readyBtn.disabled = false;
+      readyBtn.textContent = "다시 시작하려면 READY";
+    }
   }
 });
 
 socket.on("start", () => {
   gameStarted = true;
-  readyBtn.textContent = "READY 완료!";
 });
 
 socket.on("chat", ({ id, msg }) => {
@@ -72,12 +79,6 @@ socket.on("chat", ({ id, msg }) => {
   p.textContent = `${name}: ${msg}`;
   messagesDiv.appendChild(p);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
-});
-
-socket.on("joined", (side) => {
-  viewer = false;
-  updateJoinButtons(false);
-  readyBtn.style.display = "inline-block";
 });
 
 document.addEventListener("mousemove", (e) => {
@@ -102,16 +103,16 @@ joinRightBtn.addEventListener("click", () => {
   socket.emit("join", "right");
 });
 
+spectateBtn.addEventListener("click", () => {
+  socket.emit("join", "viewer");
+});
+
 chatInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && chatInput.value.trim()) {
     socket.emit("chat", chatInput.value.trim());
     chatInput.value = "";
   }
 });
-
-function updateJoinButtons(visible) {
-  document.getElementById("joinButtons").style.display = visible ? "flex" : "none";
-}
 
 function draw(state) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
